@@ -14,6 +14,9 @@ def max_movies_watched(e, m):
             dislikes.append(2)
         else:
             dislikes.append(1)
+    
+    print(liked_all)
+    print(dislikes)
 
     #bottom up-> create 2d list
     #n+1 rows and 3 columns (3 possible dislike state)
@@ -32,7 +35,7 @@ def max_movies_watched(e, m):
                 watch = 1 + dp[i + 1][curr]
 
             dp[i][prev_dislike] = max(skip, watch)
-
+        print(dp)
     return dp[0][0]
 
 E = list(map(int, input().split()))
