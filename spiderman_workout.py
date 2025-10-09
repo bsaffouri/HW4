@@ -1,53 +1,38 @@
-from collections import defaultdict
+def solution(m):
+    max_h = sum(m)
+    n = len(m)
 
-# idea: for all possible reachable height at each move, keep the best path and update it
-# bottom-up
+    dp = [[(float("inf"), "")] * (max_h + 1) for _ in range(n + 1)]
+    dp[0][0] = (0, "")
 
+    for i in range(1, n + 1):
+        movement = m[i - 1]
+        for h in range(max_h + 1):
+            above_path = ""
+            above = h + movement
+            peak_height_above = float("inf")
+            if above <= max_h:
+                peak_height_above = dp[i - 1][above][0]
+                above_path = dp[i - 1][above][1] + "D"
 
-def find_best(sequence):
-    possible = {0: ("", 0)}  # initialization, {height : ("path", peak_height)}
+            below_path = ""
+            below = h - movement
+            peak_height_below = float("inf")
+            if below >= 0:
+                peak_height_below = max(dp[i - 1][below][0], h)
+                below_path = dp[i - 1][below][1] + "U"
 
-    for num in sequence:
-        newdict = {}  # dictionary at each state
+            if peak_height_above < peak_height_below:
+                dp[i][h] = (peak_height_above, above_path)
+            else:
+                dp[i][h] = (peak_height_below, below_path)
 
-        # build on top of possible states; key = height, value = (path, peak_height)
-        for height, (path, peak_height) in possible.items():
-            # up
-            up = height + num                    # height when you decide to go up
-            new_up_path = path + "U"             # path when you decide to go up
-            # update peak height for the path
-            new_up_height = max(peak_height, up)
-
-            # check for duplicate keys; if it doesn't exist, it has never been reached.
-            if up not in newdict:
-                newdict[up] = (new_up_path, new_up_height)
-            else:  # if there are multiple ways to reach the same height, choose path with lower peak height
-                if newdict[up][1] > new_up_height:
-                    newdict[up] = (new_up_path, new_up_height)
-
-            # down
-            down = height - num
-            if down >= 0:  # consider only when path stays above ground
-                new_down_path = path + "D"
-                new_down_height = max(down, peak_height)
-                # check if duplicates exist
-                if down not in newdict:
-                    newdict[down] = (new_down_path, new_down_height)
-                else:
-                    # replace only if new path has lower peak height
-                    if newdict[down][1] > new_down_height:
-                        newdict[down] = (new_down_path, new_down_height)
-        possible = newdict
-        # print(newdict)
-
-    if 0 in possible:  # ground level is reachable
-        print(possible[0][0])
-    else:
-        print("IMPOSSIBLE")
+    print("IMPOSSIBLE") if dp[n][0][0] == float("inf") else print(dp[n][0][1])
 
 
-num_input = int(input())
-for _ in range(num_input):
-    _ = input()
-    sequence = list(map(int, input().strip().split()))
-    find_best(sequence)
+num_inputs = int(input())
+for _ in range(num_inputs):
+    input()
+    m = list(map(int, input().split()))
+
+    solution(m)
